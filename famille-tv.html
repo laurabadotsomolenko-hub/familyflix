@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FamilyFlix — TV Familiale</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red:#E50914;--red2:#ff2a36;--bg:#141414;--s1:#1f1f1f;--s2:#2a2a2a;--s3:#3a3a3a;
+    --border:#333;--text:#fff;--muted:#aaa;--dim:#666;
+    --c1:#E50914;--c2:#0071eb;--c3:#2db665;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+  /* LOGIN */
+  #ls{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;
+    background:linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.7)) center/cover,
+    repeating-linear-gradient(45deg,#1a1a1a 0,#1a1a1a 40px,#161616 40px,#161616 80px)}
+  .logo-top{position:absolute;top:28px;left:40px;font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:var(--red);letter-spacing:-1px}
+  .lbox{background:rgba(0,0,0,.88);border-radius:6px;padding:56px 64px;width:100%;max-width:440px;animation:fu .4s ease}
+  @keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .lbox h1{font-size:1.9rem;font-weight:700;margin-bottom:26px}
+  .fg{margin-bottom:14px;position:relative}
+  .fg input{width:100%;padding:18px 16px 6px;background:var(--s3);border:1px solid #555;border-radius:4px;
+    color:var(--text);font-family:inherit;font-size:1rem;outline:none;transition:border-color .2s}
+  .fg input:focus{border-color:var(--muted)}
+  .fg label{position:absolute;left:16px;top:13px;color:var(--muted);font-size:.85rem;pointer-events:none;transition:all .15s}
+  .fg input:focus+label,.fg input:not(:placeholder-shown)+label{top:6px;font-size:.68rem;color:var(--dim)}
+  .fg input::placeholder{opacity:0}
+  .btn-login{width:100%;padding:15px;background:var(--red);color:#fff;border:none;border-radius:4px;
+    font-size:1rem;font-weight:700;cursor:pointer;margin-top:8px;font-family:inherit;transition:background .2s}
+  .btn-login:hover{background:var(--red2)}
+  .err{color:#ffa07a;font-size:.8rem;margin-top:8px}
+  .hint{margin-top:18px;padding-top:14px;border-top:1px solid #2a2a2a;font-size:.72rem;color:var(--dim);line-height:1.8}
+  .hint strong{color:var(--muted)}
+
+  /* APP */
+  #app{display:none;min-height:100vh}
+  header{display:flex;align-items:center;justify-content:space-between;padding:0 52px;height:66px;
+    background:linear-gradient(to bottom,rgba(0,0,0,.95),rgba(0,0,0,.3));
+    position:sticky;top:0;z-index:50;border-bottom:1px solid #1e1e1e}
+  .logo{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--red)}
+  .hl{display:flex;align-items:center;gap:28px}
+  nav{display:flex;gap:2px}
+  .nb{padding:8px 15px;border-radius:4px;border:none;background:transparent;color:var(--muted);
+    cursor:pointer;font-family:inherit;font-size:.88rem;font-weight:500;transition:color .15s}
+  .nb:hover,.nb.active{color:var(--text);font-weight:700}
+  .hr{display:flex;align-items:center;gap:12px}
+  .av{width:34px;height:34px;border-radius:4px;border:2px solid transparent;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;transition:border-color .2s}
+  .av:hover{border-color:var(--text)}
+  .uname{font-size:.88rem;font-weight:500}
+  .btn-out{background:transparent;border:1px solid #444;color:var(--muted);padding:7px 13px;border-radius:4px;
+    cursor:pointer;font-family:inherit;font-size:.8rem;transition:all .2s}
+  .btn-out:hover{border-color:var(--muted);color:var(--text)}
+
+  main{padding:36px 52px;max-width:1280px;margin:0 auto}
+  .sec{display:none}
+  .sec.active{display:block;animation:fi .3s ease}
+  @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  .ph{margin-bottom:28px}
+  .ph h1{font-size:1.7rem;font-weight:700;margin-bottom:3px}
+  .ph p{color:var(--muted);font-size:.88rem}
+
+  /* TV CARDS */
+  .tg{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:18px}
+  .tc{background:var(--s1);border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.5);transition:transform .2s,box-shadow .2s}
+  .tc:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.7)}
+  .tch{padding:18px 20px 14px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:12px}
+  .tnum{width:44px;height:44px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+  .tch h3{font-size:1rem;font-weight:700}
+  .tch p{font-size:.76rem;color:var(--muted);margin-top:2px}
+  .tbody{padding:14px 20px}
+  .slot{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border-radius:6px;
+    background:var(--s2);margin-bottom:8px;border-left:3px solid transparent}
+  .slot.mine{border-left-color:var(--red)}
+  .sdot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0}
+  .si{flex:1;min-width:0}
+  .st{font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:1px}
+  .sp{font-size:.88rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .su{font-size:.72rem;color:var(--dim);margin-top:2px}
+  .sa{display:flex;gap:5px;align-items:flex-start;flex-shrink:0}
+  .bsm{padding:5px 10px;border-radius:4px;border:none;cursor:pointer;font-family:inherit;font-size:.73rem;font-weight:700;transition:all .15s}
+  .bdel{background:rgba(229,9,20,.15);color:#ff5a5a}
+  .bdel:hover{background:rgba(229,9,20,.3)}
+  .bask{background:rgba(255,255,255,.08);color:var(--muted)}
+  .bask:hover{background:rgba(255,255,255,.18);color:var(--text)}
+  .empty{color:var(--dim);font-size:.84rem;text-align:center;padding:16px 0}
+  .bres{width:100%;padding:11px;margin-top:4px;background:transparent;border:1px solid #3a3a3a;
+    border-radius:5px;color:var(--muted);cursor:pointer;font-family:inherit;font-size:.84rem;font-weight:600;transition:all .2s}
+  .bres:hover{background:var(--red);border-color:var(--red);color:#fff}
+
+  /* PLANNING */
+  .pc{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+  .dn{display:flex;align-items:center;gap:10px}
+  .dn button{background:var(--s2);border:1px solid var(--border);color:var(--text);width:36px;height:36px;
+    border-radius:4px;cursor:pointer;font-size:1rem;transition:background .15s}
+  .dn button:hover{background:var(--s3)}
+  .dlabel{font-size:.93rem;font-weight:600;min-width:190px;text-align:center}
+  .btd{background:var(--s2);border:1px solid var(--border);color:var(--muted);padding:8px 16px;
+    border-radius:4px;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:600;transition:all .2s}
+  .btd:hover{color:var(--text);border-color:var(--muted)}
+  .pwrap{overflow-x:auto;border-radius:8px;box-shadow:var(--shadow,0 4px 20px rgba(0,0,0,.6))}
+  .ptable{width:100%;min-width:580px;border-collapse:collapse;background:var(--s1)}
+  .ptable th{padding:13px 14px;text-align:left;font-size:.72rem;font-weight:700;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.07em;border-bottom:2px solid var(--border);background:#1a1a1a}
+  .ptable th:first-child{width:76px;color:var(--dim)}
+  .ptable td{padding:9px 11px;border-bottom:1px solid #1e1e1e;vertical-align:top;font-size:.8rem}
+  .ptable tr:last-child td{border-bottom:none}
+  .ptable tr:hover td{background:rgba(255,255,255,.02)}
+  .tcell{color:var(--dim);font-size:.76rem;font-weight:600;padding-top:11px}
+  .pchip{display:inline-flex;align-items:center;padding:4px 9px;border-radius:4px;
+    font-size:.73rem;font-weight:600;margin-bottom:3px;max-width:100%;overflow:hidden}
+  .pchip span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .leg{display:flex;gap:18px;margin-top:18px;flex-wrap:wrap}
+  .li{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--muted)}
+  .lb{width:16px;height:4px;border-radius:2px}
+
+  /* MODALS */
+  .mo{position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(3px)}
+  .mo.open{display:flex}
+  .md{background:#1c1c1c;border:1px solid #2e2e2e;border-radius:8px;padding:34px 38px;width:100%;max-width:450px;animation:fu .3s ease;box-shadow:0 16px 60px rgba(0,0,0,.85)}
+  .md h2{font-size:1.35rem;font-weight:700;margin-bottom:5px}
+  .md .sub{color:var(--muted);font-size:.83rem;margin-bottom:22px}
+  .md .fg{margin-bottom:12px}
+  .md .fg label{position:static;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px}
+  .md .fg input,.md .fg select{width:100%;padding:12px 13px;background:var(--s3);border:1px solid #444;border-radius:4px;color:var(--text);font-family:inherit;font-size:.9rem;outline:none;transition:border-color .2s}
+  .md .fg input:focus{border-color:var(--muted)}
+  .ma{display:flex;gap:10px;margin-top:22px}
+  .bc{background:var(--s3);color:var(--muted);padding:12px 20px;border-radius:4px;border:none;cursor:pointer;font-family:inherit;font-weight:600;transition:all .2s;flex:1}
+  .bc:hover{color:var(--text)}
+  .bco{background:var(--red);color:#fff;padding:12px 20px;border-radius:4px;border:none;cursor:pointer;font-family:inherit;font-weight:700;transition:background .2s;flex:2}
+  .bco:hover{background:var(--red2)}
+  .etag{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:4px;font-size:.76rem;font-weight:700;margin-bottom:18px}
+  .er{color:#ff6b6b;font-size:.8rem;margin-top:7px}
+
+  /* NOTIFS */
+  .nw{position:fixed;bottom:22px;right:22px;display:flex;flex-direction:column;gap:9px;z-index:300;pointer-events:none}
+  .notif{background:#202020;border:1px solid #2e2e2e;border-radius:8px;padding:15px 19px;max-width:320px;
+    box-shadow:0 8px 32px rgba(0,0,0,.7);animation:sin .3s ease;display:flex;gap:12px;align-items:flex-start;pointer-events:all}
+  @keyframes sin{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+  .nico{font-size:1.2rem;flex-shrink:0}
+  .ntit{font-weight:700;font-size:.86rem;margin-bottom:2px}
+  .nsub{color:var(--muted);font-size:.78rem}
+
+  @media(max-width:600px){
+    header,main{padding-left:16px;padding-right:16px}
+    .logo-top{left:16px}
+    .tg{grid-template-columns:1fr}
+    .pc{flex-direction:column;align-items:flex-start;gap:12px}
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="ls">
+  <div class="logo-top">FamilyFlix</div>
+  <div class="lbox">
+    <h1>Se connecter</h1>
+    <div class="fg">
+      <input type="email" id="lemail" placeholder=" ">
+      <label>Adresse e-mail</label>
+    </div>
+    <div class="fg">
+      <input type="password" id="lpass" placeholder=" ">
+      <label>Mot de passe</label>
+    </div>
+    <button class="btn-login" onclick="doLogin()">Se connecter</button>
+    <div class="err" id="lerr"></div>
+    <div class="hint">
+      <strong>Comptes famille :</strong><br>
+      nathan.amamou@gmail.com → <strong>nathan123</strong><br>
+      laura.badotsomolenko@gmail.com → <strong>laura123</strong><br>
+      amamou.maxime@gmail.com → <strong>max123</strong><br>
+      lydiesomolenko@free.fr → <strong>maman123</strong><br>
+      kamamou@free.fr → <strong>papa123</strong>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="hl">
+      <div class="logo">FamilyFlix</div>
+      <nav>
+        <button class="nb active" onclick="showSec('reservations',this)">Réservations</button>
+        <button class="nb" onclick="showSec('planning',this)">Planning</button>
+      </nav>
+    </div>
+    <div class="hr">
+      <div class="av" id="uav">?</div>
+      <span class="uname" id="uname"></span>
+      <button class="btn-out" onclick="doLogout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- RÉSERVATIONS -->
+    <div class="sec active" id="sec-reservations">
+      <div class="ph"><h1>Réservations TV</h1><p>Choisis ta télévision et réserve ton créneau.</p></div>
+      <div class="tg" id="tvgrid"></div>
+    </div>
+
+    <!-- PLANNING -->
+    <div class="sec" id="sec-planning">
+      <div class="pc">
+        <div class="ph" style="margin-bottom:0"><h1>Planning</h1></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btd" onclick="goToday()">Aujourd'hui</button>
+          <div class="dn">
+            <button onclick="chDay(-1)">‹</button>
+            <div class="dlabel" id="dlabel"></div>
+            <button onclick="chDay(1)">›</button>
+          </div>
+        </div>
+      </div>
+      <div class="pwrap">
+        <table class="ptable">
+          <thead><tr>
+            <th>Heure</th>
+            <th>🛏️ Chambre parents</th>
+            <th>🛋️ Salon du haut</th>
+            <th>🛋️ Salon du bas</th>
+          </tr></thead>
+          <tbody id="pbody"></tbody>
+        </table>
+      </div>
+      <div class="leg">
+        <div class="li"><div class="lb" style="background:#E50914"></div>Chambre parents</div>
+        <div class="li"><div class="lb" style="background:#0071eb"></div>Salon du haut</div>
+        <div class="li"><div class="lb" style="background:#2db665"></div>Salon du bas</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL RÉSERVATION -->
+<div class="mo" id="mores">
+  <div class="md">
+    <h2>Nouvelle réservation</h2>
+    <div class="etag" id="mtvtag"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div class="fg" style="grid-column:1/-1"><label>Date</label><input type="date" id="rdate"></div>
+      <div class="fg"><label>Début</label><input type="time" id="rstart"></div>
+      <div class="fg"><label>Fin</label><input type="time" id="rend"></div>
+    </div>
+    <div class="fg"><label>Programme</label><input type="text" id="rprog" placeholder="The Voice, Film…"></div>
+    <div class="fg"><label>Code de protection (4 chiffres)</label><input type="password" id="rcode" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+    <div class="er" id="rerr"></div>
+    <div class="ma">
+      <button class="bc" onclick="closeMo('mores')">Annuler</button>
+      <button class="bco" onclick="confirmRes()">✓ Réserver</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUPPRESSION -->
+<div class="mo" id="model">
+  <div class="md">
+    <h2>Supprimer la réservation</h2>
+    <p class="sub">Entrez votre code de protection pour confirmer.</p>
+    <div class="fg"><label>Code (4 chiffres)</label><input type="password" id="dcode" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+    <div class="er" id="derr"></div>
+    <div class="ma">
+      <button class="bc" onclick="closeMo('model')">Annuler</button>
+      <button class="bco" style="background:#b71c1c" onclick="confirmDel()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<div class="nw" id="nw"></div>
+
+<script>
+const USERS = {
+  'nathan.amamou@gmail.com':        {password:'nathan123',name:'Nathan',init:'NT',color:'#1a6bc2'},
+  'laura.badotsomolenko@gmail.com': {password:'laura123', name:'Laura', init:'LR',color:'#c2186b'},
+  'amamou.maxime@gmail.com':        {password:'max123',   name:'Max',   init:'MX',color:'#c28a18'},
+  'lydiesomolenko@free.fr':         {password:'maman123', name:'Maman', init:'MM',color:'#18a0c2'},
+  'kamamou@free.fr':                {password:'papa123',  name:'Papa',  init:'PP',color:'#2db665'},
+};
+const TVS=[
+  {id:'tv1',name:'Chambre parents',icon:'🛏️',color:'#E50914',bg:'rgba(229,9,20,0.13)'},
+  {id:'tv2',name:'Salon du haut',  icon:'🛋️',color:'#0071eb',bg:'rgba(0,113,235,0.13)'},
+  {id:'tv3',name:'Salon du bas',   icon:'🛋️',color:'#2db665',bg:'rgba(45,182,101,0.13)'},
+];
+
+let cu=null, res=JSON.parse(localStorage.getItem('ff2_res')||'[]'), ctvId=null, delTgt=null;
+let pDate=new Date(); pDate.setHours(0,0,0,0);
+
+function save(){localStorage.setItem('ff2_res',JSON.stringify(res))}
+
+function doLogin(){
+  const email=document.getElementById('lemail').value.trim().toLowerCase();
+  const pass=document.getElementById('lpass').value;
+  const u=USERS[email];
+  if(!u||u.password!==pass){document.getElementById('lerr').textContent='Email ou mot de passe incorrect.';return}
+  cu={email,...u};
+  document.getElementById('ls').style.display='none';
+  document.getElementById('app').style.display='block';
+  const av=document.getElementById('uav'); av.textContent=u.init; av.style.background=u.color;
+  document.getElementById('uname').textContent=u.name;
+  renderTVs(); renderPlanning();
+}
+function doLogout(){
+  cu=null; document.getElementById('ls').style.display='flex'; document.getElementById('app').style.display='none';
+  document.getElementById('lemail').value=''; document.getElementById('lpass').value=''; document.getElementById('lerr').textContent='';
+}
+function showSec(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active'); btn.classList.add('active');
+  if(id==='planning') renderPlanning();
+}
+
+function upcoming(tvId){
+  const td=new Date().toISOString().split('T')[0];
+  return res.filter(r=>r.tvId===tvId&&r.date>=td).sort((a,b)=>a.date.localeCompare(b.date)||a.start.localeCompare(b.start)).slice(0,5);
+}
+function renderTVs(){
+  const g=document.getElementById('tvgrid'); g.innerHTML='';
+  TVS.forEach(tv=>{
+    const slots=upcoming(tv.id);
+    const sh=slots.length===0?'<div class="empty">Aucune réservation à venir</div>':slots.map(r=>{
+      const isMe=r.uEmail===cu.email;
+      const df=new Date(r.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+      const ab=isMe?`<button class="bsm bdel" onclick="openDel('${r.id}')">🗑</button>`:`<button class="bsm bask" onclick="askSwap('${r.id}')">🔔 Demander</button>`;
+      return `<div class="slot${isMe?' mine':''}">
+        <div class="sdot" style="background:${tv.color}"></div>
+        <div class="si"><div class="st">${df} · ${r.start}–${r.end}</div><div class="sp">${r.program}</div><div class="su">par ${r.uName}</div></div>
+        <div class="sa">${ab}</div>
+      </div>`;
+    }).join('');
+    g.innerHTML+=`<div class="tc">
+      <div class="tch"><div class="tnum" style="background:${tv.bg}">${tv.icon}</div>
+        <div><h3>${tv.name}</h3><p>${slots.length} réservation(s) à venir</p></div></div>
+      <div class="tbody">${sh}<button class="bres" onclick="openRes('${tv.id}')">+ Réserver un créneau</button></div>
+    </div>`;
+  });
+}
+
+function openRes(tvId){
+  ctvId=tvId; const tv=TVS.find(t=>t.id===tvId);
+  const tag=document.getElementById('mtvtag'); tag.textContent=tv.icon+' '+tv.name; tag.style.background=tv.bg; tag.style.color=tv.color;
+  const td=new Date().toISOString().split('T')[0];
+  document.getElementById('rdate').value=td; document.getElementById('rdate').min=td;
+  ['rstart','rend','rprog','rcode'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('rerr').textContent='';
+  document.getElementById('mores').classList.add('open');
+}
+function confirmRes(){
+  const date=document.getElementById('rdate').value, start=document.getElementById('rstart').value;
+  const end=document.getElementById('rend').value, prog=document.getElementById('rprog').value.trim();
+  const code=document.getElementById('rcode').value.trim(), err=document.getElementById('rerr');
+  if(!date||!start||!end||!prog||!code){err.textContent='Tous les champs sont obligatoires.';return}
+  if(!/^\d{4}$/.test(code)){err.textContent='Le code doit contenir exactement 4 chiffres.';return}
+  if(start>=end){err.textContent="L'heure de fin doit être après l'heure de début.";return}
+  const ov=res.find(r=>r.tvId===ctvId&&r.date===date&&!(end<=r.start||start>=r.end));
+  if(ov){err.textContent=`Créneau déjà pris par ${ov.uName} (${ov.start}–${ov.end}).`;return}
+  res.push({id:Date.now().toString(),tvId:ctvId,date,start,end,program:prog,code,uEmail:cu.email,uName:cu.name});
+  save(); closeMo('mores'); renderTVs(); renderPlanning();
+  notif('✅','Réservation confirmée',TVS.find(t=>t.id===ctvId).name+' · '+start+'–'+end);
+}
+
+function openDel(id){
+  delTgt=id; document.getElementById('dcode').value=''; document.getElementById('derr').textContent='';
+  document.getElementById('model').classList.add('open');
+}
+function confirmDel(){
+  const code=document.getElementById('dcode').value.trim();
+  const r=res.find(x=>x.id===delTgt);
+  if(!r){closeMo('model');return}
+  if(r.code!==code){document.getElementById('derr').textContent='Code incorrect.';return}
+  res=res.filter(x=>x.id!==delTgt); save(); closeMo('model'); renderTVs(); renderPlanning();
+  notif('🗑️','Réservation supprimée','Le créneau est à nouveau libre.');
+}
+function askSwap(id){
+  const r=res.find(x=>x.id===id); if(!r) return;
+  notif('🔔','Demande envoyée !',r.uName+' a été notifié(e) pour le créneau '+r.start+'–'+r.end+'.');
+}
+function closeMo(id){document.getElementById(id).classList.remove('open')}
+
+// PLANNING
+const HRS=Array.from({length:20},(_,i)=>i+5);
+function goToday(){pDate=new Date();pDate.setHours(0,0,0,0);renderPlanning()}
+function chDay(d){pDate.setDate(pDate.getDate()+d);renderPlanning()}
+function renderPlanning(){
+  const ds=pDate.toISOString().split('T')[0];
+  const lbl=pDate.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('dlabel').textContent=lbl.charAt(0).toUpperCase()+lbl.slice(1);
+  const colors={tv1:'rgba(229,9,20,',tv2:'rgba(0,113,235,',tv3:'rgba(45,182,101,'};
+  const tcolors={tv1:'#E50914',tv2:'#0071eb',tv3:'#2db665'};
+  let html='';
+  HRS.forEach(h=>{
+    const hs=String(h).padStart(2,'0')+':00';
+    const he=h===23?'24:00':String(h+1).padStart(2,'0')+':00';
+    let row=`<tr><td class="tcell">${hs}</td>`;
+    TVS.forEach(tv=>{
+      const slots=res.filter(r=>r.tvId===tv.id&&r.date===ds&&!(he<=r.start||hs>=r.end));
+      const chips=slots.map(r=>{
+        const isMe=r.uEmail===cu?.email;
+        const bg=colors[tv.id]+(isMe?'0.28)':'0.13)');
+        return `<div class="pchip" style="background:${bg};color:${tcolors[tv.id]};border:1px solid ${colors[tv.id]}0.25)"><span>${r.uName} · ${r.program}</span></div>`;
+      }).join('');
+      row+=`<td>${chips}</td>`;
+    });
+    row+='</tr>'; html+=row;
+  });
+  document.getElementById('pbody').innerHTML=html;
+}
+
+function notif(icon,title,sub){
+  const w=document.getElementById('nw'), d=document.createElement('div');
+  d.className='notif'; d.innerHTML=`<div class="nico">${icon}</div><div><div class="ntit">${title}</div><div class="nsub">${sub}</div></div>`;
+  w.appendChild(d);
+  setTimeout(()=>{d.style.cssText='opacity:0;transform:translateX(60px);transition:.3s';setTimeout(()=>d.remove(),300)},4000);
+}
+
+document.getElementById('lemail').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('lpass').focus()});
+document.getElementById('lpass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+['mores','model'].forEach(id=>document.getElementById(id).addEventListener('click',e=>{if(e.target===document.getElementById(id))closeMo(id)}));
+</script>
+</body>
+</html>
